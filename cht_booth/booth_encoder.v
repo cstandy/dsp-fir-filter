@@ -12,9 +12,12 @@ reg high;
 reg low;
 
 always @(in) begin
-	inv = a & (~b | ~c);
-	high = (~a & b & c) | (a & ~b & ~c);
-	low = (~b & c) | (b & ~c);
+	inv = a & ~(b & c);
+	// inv = a & (~b | ~c);
+	high = (~a & b & c) | ~(~a | b | c);
+	// high = (~a & b & c) | (a & ~b & ~c);
+	low = ~(b | ~c) | ~(~b | c);
+	// low = (~b & c) | (b & ~c);
 	shift = {high, low};
 end
 
