@@ -1,10 +1,10 @@
 `include "mux2_1.v"
-module mux2_1_9b(out, in1, in2, select);
+module mux2_1_10b(out, in1, in2, select);
 
-input [8:0] in1;
-input [8:0] in2;
-input select;
-output [8:0] out;
+input  [9:0] in1;
+input  [9:0] in2;
+input        select;
+output [9:0] out;
 
 // assign out = select ? in2 : in1;
 
@@ -17,5 +17,6 @@ mux2_1 mux5(.out(out[5]), .in1(in1[5]), .in2(in2[5]), .select(select));
 mux2_1 mux6(.out(out[6]), .in1(in1[6]), .in2(in2[6]), .select(select));
 mux2_1 mux7(.out(out[7]), .in1(in1[7]), .in2(in2[7]), .select(select));
 mux2_1 mux8(.out(out[8]), .in1(in1[8]), .in2(in2[8]), .select(select));
+mux2_1 mux9(.out(out[9]), .in1(in1[9]), .in2(in2[9]), .select(select));
 
 endmodule 
