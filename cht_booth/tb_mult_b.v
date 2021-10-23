@@ -43,6 +43,31 @@ initial begin
   A = 100; B = -72;
   #(`CYCLE/2)
   $display("A = %d, B = %d, P = %d", $signed(A), $signed(B), $signed(P));
+  A = 127; B = 127;
+  #(`CYCLE/2)
+  $display("A = %d, B = %d, P = %d", $signed(A), $signed(B), $signed(P));
+  A = -127; B = 127;
+  #(`CYCLE/2)
+  $display("A = %d, B = %d, P = %d", $signed(A), $signed(B), $signed(P));
+  A = -127; B = -127;
+  #(`CYCLE/2)
+  $display("A = %d, B = %d, P = %d", $signed(A), $signed(B), $signed(P));
+  A = 127; B = -127;
+  #(`CYCLE/2)
+  $display("A = %d, B = %d, P = %d", $signed(A), $signed(B), $signed(P));
+  A = 127; B = -128;
+  #(`CYCLE/2)
+  $display("A = %d, B = %d, P = %d", $signed(A), $signed(B), $signed(P));
+  A = -128; B = 127;
+  #(`CYCLE/2)
+  $display("A = %d, B = %d, P = %d", $signed(A), $signed(B), $signed(P));
+  A = -128; B = -128;
+  #(`CYCLE/2)
+  $display("A = %d, B = %d, P = %d", $signed(A), $signed(B), $signed(P));
+  A = -128; B = -110;
+  #(`CYCLE/2)
+  $display("A = %d, B = %d, P = %d", $signed(A), $signed(B), $signed(P));
+
   $finish;
 end
 

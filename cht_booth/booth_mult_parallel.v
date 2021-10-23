@@ -13,15 +13,14 @@ output [2*`OPERAND_SIZE-1:0] product;
 
 wire   [`OPERAND_SIZE-1:0]   m   = multiplier;
 wire   [`OPERAND_SIZE-1:0]   md  = multiplicand;
-// wire   [`OPERAND_SIZE-1:0]   m_b = ~m + 1;
 
 wire [3:0] inv;
 wire [1:0] shift [0:3];
 
-wire [`OPERAND_SIZE:0]    temp_a [0:3]; // Appends w/o Sign extend nor shift
+wire [`OPERAND_SIZE+1:0]  temp_a [0:3]; // Appends w/o Sign extend nor shift
 reg [2*`OPERAND_SIZE-1:0] a      [0:3]; // Addends
 reg [2*`OPERAND_SIZE-1:0] p_sum  [0:1]; // Partial sum
-reg [2*`OPERAND_SIZE-1:0] sum; // Final sum == product == final result
+reg [2*`OPERAND_SIZE-1:0] sum;          // Final sum == product == final result
 
 assign product = sum;
 
@@ -39,10 +38,10 @@ select_m sm4(.out(temp_a[3]), .in(md), .sel({inv[3], shift[3]}));
 
 // Sign extend (temp_a is already extended 1 bit for local shift) and global shift
 always @(*) begin
-    a[0] = (temp_a[0][`OPERAND_SIZE]) ? {7'b111_1111, temp_a[0]} :       {7'b0, temp_a[0]};
-    a[1] = (temp_a[1][`OPERAND_SIZE]) ? {5'b1_1111,   temp_a[1], 2'b0} : {5'b0, temp_a[1], 2'b0};
-    a[2] = (temp_a[2][`OPERAND_SIZE]) ? {3'b111,      temp_a[2], 4'b0} : {3'b0, temp_a[2], 4'b0};
-    a[3] = (temp_a[3][`OPERAND_SIZE]) ? {1'b1,        temp_a[3], 6'b0} : {1'b0, temp_a[3], 6'b0};
+    a[0] = (temp_a[0][`OPERAND_SIZE+1]) ? {6'b11_1111, temp_a[0]}       : {6'b0, temp_a[0]};
+    a[1] = (temp_a[1][`OPERAND_SIZE+1]) ? {4'b1111,    temp_a[1], 2'b0} : {4'b0, temp_a[1], 2'b0};
+    a[2] = (temp_a[2][`OPERAND_SIZE+1]) ? {2'b11,      temp_a[2], 4'b0} : {2'b0, temp_a[2], 4'b0};
+    a[3] = (temp_a[3][`OPERAND_SIZE+1]) ? {            temp_a[3], 6'b0} : {      temp_a[3], 6'b0};
 end
 
 // Adder tree

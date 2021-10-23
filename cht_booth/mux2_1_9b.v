@@ -1,12 +1,12 @@
 `include "mux2_1.v"
-module mux2_1_8b(out, in1, in2, select);
+module mux2_1_9b(out, in1, in2, select);
 
 input [8:0] in1;
 input [8:0] in2;
 input select;
 output [8:0] out;
 
-//assign out = select ? in2 : in1;
+// assign out = select ? in2 : in1;
 
 mux2_1 mux0(.out(out[0]), .in1(in1[0]), .in2(in2[0]), .select(select));
 mux2_1 mux1(.out(out[1]), .in1(in1[1]), .in2(in2[1]), .select(select));
