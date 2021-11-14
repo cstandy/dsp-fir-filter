@@ -5,6 +5,7 @@
 `include "booth_encoder.v"
 `include "select_m.v"
 `include "mux2_1_16b.v"
+`include "cla_16b.v"
 
 module booth_mult(product, multiplicand, multiplier);
 
@@ -20,8 +21,8 @@ wire [1:0] shift [0:3];
 
 wire [`OPERAND_SIZE+1:0]   temp_a [0:3]; // Appends w/o Sign extend nor shift
 wire [2*`OPERAND_SIZE-1:0] a      [0:3]; // Addends
-reg [2*`OPERAND_SIZE-1:0]  p_sum  [0:1]; // Partial sum
-reg [2*`OPERAND_SIZE-1:0]  sum;          // Final sum == product == final result
+wire [2*`OPERAND_SIZE-1:0] p_sum  [0:1]; // Partial sum
+wire [2*`OPERAND_SIZE-1:0] sum;          // Final sum == product == final result
 
 assign product = sum;
 
@@ -43,11 +44,8 @@ mux2_1_16b m2(.out(a[1]), .in1({4'b0, temp_a[1], 2'b0}), .in2({4'b1111,    temp_
 mux2_1_16b m3(.out(a[2]), .in1({2'b0, temp_a[2], 4'b0}), .in2({2'b11,      temp_a[2], 4'b0}), .select(temp_a[2][`OPERAND_SIZE+1]));
 mux2_1_16b m4(.out(a[3]), .in1({      temp_a[3], 6'b0}), .in2({            temp_a[3], 6'b0}), .select(temp_a[3][`OPERAND_SIZE+1]));
 
-// Adder tree
-always @(*) begin
-    p_sum[0] = a[0] + a[1];
-    p_sum[1] = a[2] + a[3];
-    sum = p_sum[0] + p_sum[1];
-end
+cla_16b cla_16b_1(.s(p_sum[0]), .cin(1'b0), .a(a[0]    ), .b(a[1]    ));
+cla_16b cla_16b_2(.s(p_sum[1]), .cin(1'b0), .a(a[2]    ), .b(a[3]    ));
+cla_16b cla_16b_3(.s(sum     ), .cin(1'b0), .a(p_sum[0]), .b(p_sum[1]));
 
 endmodule
