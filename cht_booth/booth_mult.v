@@ -1,72 +1,51 @@
 `define OPERAND_SIZE 8
-`define COUNTER_SIZE 5
 `define TRUE  1
 `define FALSE 0
 
-module booth_mult(clk, enable, finish, product, multiplicand, multiplier);
+`include "booth_encoder.v"
+`include "select_m.v"
+`include "mux2_1_16b.v"
+`include "cla_16b.v"
 
-input                        clk;
-input                        enable;
+module booth_mult(product, multiplicand, multiplier);
+
 input  [`OPERAND_SIZE-1:0]   multiplicand;
 input  [`OPERAND_SIZE-1:0]   multiplier;
 output [2*`OPERAND_SIZE-1:0] product;
-output                       finish;
 
-reg                          rst;
-wire   [`OPERAND_SIZE-1:0]   m   = multiplicand;
-wire   [`OPERAND_SIZE-1:0]   m_b = ~m + 1;
-reg    [`COUNTER_SIZE-1:0]   counter;
-reg                          finish;
-reg    [2*`OPERAND_SIZE:0]   P;
-wire   [2*`OPERAND_SIZE:0]   A = {m,   `OPERAND_SIZE'b0, 1'b0};
-wire   [2*`OPERAND_SIZE:0]   S = {m_b, `OPERAND_SIZE'b0, 1'b0};
-wire   [2*`OPERAND_SIZE-1:0] product = P[2*`OPERAND_SIZE:1]; // Drop SLB
+wire   [`OPERAND_SIZE-1:0]   m   = multiplier;
+wire   [`OPERAND_SIZE-1:0]   md  = multiplicand;
 
-reg    [2*`OPERAND_SIZE:0]   sumPS;
-reg    [2*`OPERAND_SIZE:0]   sumPA;
-reg    [2*`OPERAND_SIZE:0]   nxtPS;
-reg    [2*`OPERAND_SIZE:0]   nxtPA;
-reg    [2*`OPERAND_SIZE:0]   nxtP;
+wire [3:0] inv;
+wire [1:0] shift [0:3];
 
-// Do arithmetic right shift one bit
-always @(*) begin
-  sumPS = P + S;
-  sumPA = P + A;
-  nxtPS = sumPS >> 1;
-  nxtPA = sumPA >> 1;
-  nxtPS[2*`OPERAND_SIZE] = sumPS[2*`OPERAND_SIZE];
-  nxtPA[2*`OPERAND_SIZE] = sumPA[2*`OPERAND_SIZE];
-  nxtP  = P >> 1;
-  nxtP[2*`OPERAND_SIZE] = P[2*`OPERAND_SIZE];
-end
+wire [`OPERAND_SIZE+1:0]   temp_a [0:3]; // Appends w/o Sign extend nor shift
+wire [2*`OPERAND_SIZE-1:0] a      [0:3]; // Addends
+wire [2*`OPERAND_SIZE-1:0] p_sum  [0:1]; // Partial sum
+wire [2*`OPERAND_SIZE-1:0] sum;          // Final sum == product == final result
 
-always @(posedge enable) begin
-                 rst <= `TRUE;
-  @(posedge clk) rst <= `FALSE;
-end
+assign product = sum;
 
-always @(posedge clk) begin
-  if (rst) begin
-    P       <= {`OPERAND_SIZE'b0, multiplier, 1'b0};
-    counter <= `COUNTER_SIZE'b0;
-    finish  <= `FALSE;
-  end
-  else if (counter == `OPERAND_SIZE) begin
-    P       <= P;
-    counter <= counter;
-    finish  <= `TRUE;
-  end
-  else begin
-    case (P[1:0])
-      2'b00:   P <= nxtP;
-      2'b01:   P <= nxtPA;
-      2'b10:   P <= nxtPS;
-      2'b11:   P <= nxtP;
-      default: P <= P;
-    endcase
-    counter <= counter + 1;
-    finish  <= `FALSE;
-  end
-end
+// Parallel encoding
+booth_encoder be1(.inv(inv[0]), .shift(shift[0]), .in({m[1:0], 1'b0}));
+booth_encoder be2(.inv(inv[1]), .shift(shift[1]), .in(m[3:1]        ));
+booth_encoder be3(.inv(inv[2]), .shift(shift[2]), .in(m[5:3]        ));
+booth_encoder be4(.inv(inv[3]), .shift(shift[3]), .in(m[7:5]        ));
+
+// Mux select multiplicand
+select_m sm1(.out(temp_a[0]), .in(md), .sel({inv[0], shift[0]}));
+select_m sm2(.out(temp_a[1]), .in(md), .sel({inv[1], shift[1]}));
+select_m sm3(.out(temp_a[2]), .in(md), .sel({inv[2], shift[2]}));
+select_m sm4(.out(temp_a[3]), .in(md), .sel({inv[3], shift[3]}));
+
+// Sign extend (temp_a is already extended 2 bits for local shift) and global shift
+mux2_1_16b m1(.out(a[0]), .in1({6'b0, temp_a[0]}      ), .in2({6'b11_1111, temp_a[0]}      ), .select(temp_a[0][`OPERAND_SIZE+1]));
+mux2_1_16b m2(.out(a[1]), .in1({4'b0, temp_a[1], 2'b0}), .in2({4'b1111,    temp_a[1], 2'b0}), .select(temp_a[1][`OPERAND_SIZE+1]));
+mux2_1_16b m3(.out(a[2]), .in1({2'b0, temp_a[2], 4'b0}), .in2({2'b11,      temp_a[2], 4'b0}), .select(temp_a[2][`OPERAND_SIZE+1]));
+mux2_1_16b m4(.out(a[3]), .in1({      temp_a[3], 6'b0}), .in2({            temp_a[3], 6'b0}), .select(temp_a[3][`OPERAND_SIZE+1]));
+
+cla_16b cla_16b_1(.s(p_sum[0]), .cin(1'b0), .a(a[0]    ), .b(a[1]    ));
+cla_16b cla_16b_2(.s(p_sum[1]), .cin(1'b0), .a(a[2]    ), .b(a[3]    ));
+cla_16b cla_16b_3(.s(sum     ), .cin(1'b0), .a(p_sum[0]), .b(p_sum[1]));
 
 endmodule

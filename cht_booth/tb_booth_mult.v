@@ -1,7 +1,7 @@
 `timescale 1ns/1ps
 `define CYCLE 10.0
 
-`include "booth_mult_parallel.v"
+`include "booth_mult.v"
 
 module mult_tb();
 

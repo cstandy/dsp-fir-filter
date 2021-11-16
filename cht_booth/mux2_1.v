@@ -13,5 +13,3 @@ nor (T2, ~in1, select);
 or (out, T1, T2);
 
 endmodule
-
-
