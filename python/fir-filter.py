@@ -4,7 +4,7 @@ BIT_NUM = 8
 RAND_SEED = 0
 INPUT_SIZE = 8
 
-np.random.seed(0)
+np.random.seed(1)
 
 c = np.array([1, 2, 3])
 

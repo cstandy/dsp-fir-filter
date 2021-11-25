@@ -35,17 +35,26 @@ $display("Setup reg");
 
 $display("Init c");
 /* Assign the coefficient */
-#(`CYCLE) din =  44; c0 = 1; c1 = 2; c2 = 3;
-#(`CYCLE) din = -81;
+// #(`CYCLE) din =  44; c0 = 1; c1 = 2; c2 = 3;
+// #(`CYCLE) din = -81;
+#(`CYCLE) din = -91; c0 = 1; c1 = 2; c2 = 3;
+#(`CYCLE) din = 107;
 
 $display("Start read");
 /* Start to read the result since the third cycle */
-#(`CYCLE)   din = -11; #(`CYCLE/2)$display("dout: %d", $signed(dout));
-#(`CYCLE/2) din =  64; #(`CYCLE/2)$display("dout: %d", $signed(dout));
-#(`CYCLE/2) din = -61; #(`CYCLE/2)$display("dout: %d", $signed(dout));
-#(`CYCLE/2) din = 123; #(`CYCLE/2)$display("dout: %d", $signed(dout));
-#(`CYCLE/2) din =  67; #(`CYCLE/2)$display("dout: %d", $signed(dout));
-#(`CYCLE/2) din = -25; #(`CYCLE/2)$display("dout: %d", $signed(dout));
+// #(`CYCLE)   din = -11; #(`CYCLE/2)$display("dout: %d", $signed(dout));
+// #(`CYCLE/2) din =  64; #(`CYCLE/2)$display("dout: %d", $signed(dout));
+// #(`CYCLE/2) din = -61; #(`CYCLE/2)$display("dout: %d", $signed(dout));
+// #(`CYCLE/2) din = 123; #(`CYCLE/2)$display("dout: %d", $signed(dout));
+// #(`CYCLE/2) din =  67; #(`CYCLE/2)$display("dout: %d", $signed(dout));
+// #(`CYCLE/2) din = -25; #(`CYCLE/2)$display("dout: %d", $signed(dout));
+
+#(`CYCLE)   din =  12; #(`CYCLE/2)$display("dout: %d", $signed(dout));
+#(`CYCLE/2) din = -56; #(`CYCLE/2)$display("dout: %d", $signed(dout));
+#(`CYCLE/2) din = 127; #(`CYCLE/2)$display("dout: %d", $signed(dout));
+#(`CYCLE/2) din =   9; #(`CYCLE/2)$display("dout: %d", $signed(dout));
+#(`CYCLE/2) din =  75; #(`CYCLE/2)$display("dout: %d", $signed(dout));
+#(`CYCLE/2) din =   5; #(`CYCLE/2)$display("dout: %d", $signed(dout));
 
 $display("End");
 /* Simulation ends */
