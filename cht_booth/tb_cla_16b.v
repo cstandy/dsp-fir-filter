@@ -7,7 +7,7 @@ module cla_16b_tb();
 
 reg  [15:0] a;
 reg  [15:0] b;
-reg        cin;
+reg         cin;
 wire [15:0] s;
 wire pg, gg, cout;
 
